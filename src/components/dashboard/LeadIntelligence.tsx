@@ -355,11 +355,26 @@ const LeadIntelligence = ({ onOpenProfile }: LeadIntelligenceProps) => {
 
   const handleLeadTypeChange = (contactId: number, newLeadType: string) => {
     setContacts((prev) =>
-      prev.map((contact) =>
-        contact.id === contactId
-          ? { ...contact, leadType: newLeadType }
-          : contact
-      )
+      prev.map((contact) => {
+        if (contact.id === contactId) {
+          // Find the latest interaction by date
+          const latestIdx = contact.timeline
+            .map((item, idx) => ({ idx, date: new Date(item.interactionDate) }))
+            .sort((a, b) => b.date.getTime() - a.date.getTime())[0]?.idx;
+          let updatedTimeline = contact.timeline;
+          if (typeof latestIdx === "number") {
+            updatedTimeline = contact.timeline.map((item, idx) =>
+              idx === latestIdx ? { ...item, leadType: newLeadType } : item
+            );
+          }
+          return {
+            ...contact,
+            leadType: newLeadType,
+            timeline: updatedTimeline,
+          };
+        }
+        return contact;
+      })
     );
   };
 
@@ -625,174 +640,147 @@ const LeadIntelligence = ({ onOpenProfile }: LeadIntelligenceProps) => {
   }
 
   return (
-    <div className="h-full flex flex-col bg-background">
-      <div className="p-6 border-b bg-card">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-2 text-foreground">
-            Lead Intelligence
-          </h1>
-          <p className="text-muted-foreground">
-            Comprehensive view of all contacts from chat and call interactions
-          </p>
+    <div className="p-6 space-y-6">
+      {/* Header with title only */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Lead Intelligence</h1>
+      </div>
+
+      {/* Search bar and controls */}
+      <div className="flex items-center justify-between">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            placeholder="Search contacts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-64"
+          />
         </div>
-
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search contacts..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-background border-border text-foreground"
-              />
-            </div>
-          </div>
-
+        <div className="flex items-center space-x-2">
           <Select value={leadTypeFilter} onValueChange={setLeadTypeFilter}>
-            <SelectTrigger className="w-40 bg-background border-border">
+            <SelectTrigger className="w-40">
               <SelectValue placeholder="Lead Type" />
             </SelectTrigger>
-            <SelectContent className="bg-popover border-border">
+            <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="Inbound">Inbound</SelectItem>
               <SelectItem value="Outbound">Outbound</SelectItem>
               <SelectItem value="Customer">Customer</SelectItem>
             </SelectContent>
           </Select>
-
           <Select value={tagFilter} onValueChange={setTagFilter}>
-            <SelectTrigger className="w-40 bg-background border-border">
+            <SelectTrigger className="w-40">
               <SelectValue placeholder="Lead Tag" />
             </SelectTrigger>
-            <SelectContent className="bg-popover border-border">
+            <SelectContent>
               <SelectItem value="all">All Tags</SelectItem>
               <SelectItem value="Hot">Hot</SelectItem>
               <SelectItem value="Warm">Warm</SelectItem>
               <SelectItem value="Cold">Cold</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button variant="outline" className="border-border">
+          <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
         </div>
       </div>
-
-      <div className="flex-1 overflow-auto bg-muted/30">
-        <div className="p-6">
-          <div className="bg-card rounded-lg border border-border">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border">
-                  <TableHead className="w-12">
-                    <Checkbox
-                      checked={
-                        selectedContacts.length === filteredContacts.length &&
-                        filteredContacts.length > 0
-                      }
-                      onCheckedChange={handleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Contact
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Business Type
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Lead Type
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Recent Lead Tag
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    No. of Interactions
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Interacted Agent
-                  </TableHead>
-                  <TableHead className="text-muted-foreground">
-                    Last Interaction
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredContacts.map((contact) => (
-                  <TableRow
-                    key={contact.id}
-                    className="border-border hover:bg-muted/50 cursor-pointer"
-                    onClick={() => handleContactClick(contact)}
+      {/* Table */}
+      <div className="border rounded-lg dark:bg-[#020817]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">
+                <Checkbox
+                  checked={
+                    selectedContacts.length === filteredContacts.length &&
+                    filteredContacts.length > 0
+                  }
+                  onCheckedChange={handleSelectAll}
+                />
+              </TableHead>
+              <TableHead>Contact</TableHead>
+              <TableHead>Business Type</TableHead>
+              <TableHead>Lead Type</TableHead>
+              <TableHead>Recent Lead Tag</TableHead>
+              <TableHead>No. of Interactions</TableHead>
+              <TableHead>Interacted Agent</TableHead>
+              <TableHead>Last Interaction</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredContacts.map((contact) => (
+              <TableRow
+                key={contact.id}
+                className="border-border hover:bg-muted/50 cursor-pointer"
+                onClick={() => handleContactClick(contact)}
+              >
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedContacts.includes(contact.id)}
+                    onCheckedChange={(checked) =>
+                      handleSelectContact(contact.id, checked as boolean)
+                    }
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium text-foreground">
+                    {contact.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {contact.email}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {contact.phone}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {contact.company}
+                  </div>
+                </TableCell>
+                <TableCell className="text-foreground">
+                  {contact.businessType}
+                </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Select
+                    value={contact.leadType}
+                    onValueChange={(value) =>
+                      handleLeadTypeChange(contact.id, value)
+                    }
                   >
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedContacts.includes(contact.id)}
-                        onCheckedChange={(checked) =>
-                          handleSelectContact(contact.id, checked as boolean)
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium text-foreground">
-                        {contact.name}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {contact.email}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {contact.phone}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {contact.company}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {contact.businessType}
-                    </TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Select
-                        value={contact.leadType}
-                        onValueChange={(value) =>
-                          handleLeadTypeChange(contact.id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-32 bg-background border-border">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-popover border-border">
-                          <SelectItem value="Inbound">Inbound</SelectItem>
-                          <SelectItem value="Outbound">Outbound</SelectItem>
-                          <SelectItem value="Customer">Customer</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getTagColor(contact.recentLeadTag)}>
-                        {contact.recentLeadTag}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {contact.interactions}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {contact.interactedAgent}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {contact.lastContact}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Inbound">Inbound</SelectItem>
+                      <SelectItem value="Outbound">Outbound</SelectItem>
+                      <SelectItem value="Customer">Customer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Badge className={getTagColor(contact.recentLeadTag)}>
+                    {contact.recentLeadTag}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-foreground">
+                  {contact.interactions}
+                </TableCell>
+                <TableCell className="text-foreground">
+                  {contact.interactedAgent}
+                </TableCell>
+                <TableCell className="text-foreground">
+                  {contact.lastContact}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {filteredContacts.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No contacts found matching your criteria.
           </div>
-
-          {filteredContacts.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              No contacts found matching your criteria.
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

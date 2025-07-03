@@ -1594,7 +1594,11 @@ const ImportedData = ({ onOpenProfile }: ImportedDataProps) => {
       )}
 
       {/* Table */}
-      <div className="border rounded-lg">
+      <div
+        className={`border rounded-lg ${
+          theme === "dark" ? "bg-[#020817] border-gray-700" : "border-gray-200"
+        }`}
+      >
         <Table>
           <TableHeader>
             <TableRow>

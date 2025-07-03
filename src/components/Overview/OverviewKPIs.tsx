@@ -102,11 +102,7 @@ export default function OverviewKPIs({ filters }) {
               </div>
 
               <div className="flex items-baseline gap-2">
-                <span
-                  className={`text-2xl font-bold ${
-                    kpi.efficiency ? getEfficiencyColor(kpi.efficiency) : ""
-                  }`}
-                >
+                <span className="text-2xl font-bold text-white">
                   {kpi.value}
                 </span>
                 {kpi.percentage && (

@@ -1,0 +1,4 @@
+Name,Email,Phone,Lead Type,Lead Tag,Business Type,Engagement Level,Intent Level,Budget Constraint,Timeline Urgency
+John Doe,john@example.com,+1234567890,Inbound,Hot,SaaS,High,High,Medium,High
+Jane Smith,jane@example.com,+0987654321,Outbound,Warm,E-commerce,Medium,Medium,High,Medium
+Mike Johnson,mike@example.com,+1122334455,Customer,Cold,Fintech,Low,Low,Low,Low 

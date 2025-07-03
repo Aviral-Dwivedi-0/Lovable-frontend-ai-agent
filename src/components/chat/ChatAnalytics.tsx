@@ -43,6 +43,7 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import { InfoIcon } from "@/components/ui/info-icon";
 
 const ChatAnalytics = () => {
   const { theme } = useTheme();
@@ -501,158 +502,159 @@ const ChatAnalytics = () => {
     }
   };
   return (
-    <div
-      className={`space-y-6 ${
-        theme === "dark" ? "bg-black" : "bg-gray-50"
-      } min-h-full p-6`}
-    >
-      {/* Global Filters */}
-      <div className="bg-transparent">
-        <div className="grid grid-cols-4 gap-4">
-          <div>
-            <label
-              className={`text-sm mb-2 block ${
-                theme === "dark" ? "text-slate-300" : "text-gray-700"
-              }`}
-            >
-              Date Range
-            </label>
-            <div className="relative">
-              <select
-                value={selectedDateOption}
-                onChange={(e) => handleDateOptionChange(e.target.value)}
-                className={`w-full rounded-lg px-3 py-2 appearance-none pr-8 border ${
-                  theme === "dark"
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-black"
-                }`}
-              >
-                {dateOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400" />
-            </div>
+    <div className="space-y-6 p-6">
+      {/* Top Info Section */}
+      <div className="flex items-center justify-between mb-6">
+        <h1
+          className={`text-2xl font-bold ${
+            theme === "dark" ? "text-white" : "text-gray-900"
+          }`}
+        >
+          SniperThink AI Chat Agent
+        </h1>
+        <div className="flex items-center space-x-4">
+          <span
+            className={theme === "dark" ? "text-slate-300" : "text-gray-600"}
+          >
+            Credits Remaining:
+          </span>
+          <span
+            className={`font-semibold ${
+              theme === "dark" ? "text-white" : "text-gray-900"
+            }`}
+          >
+            450/500
+          </span>
+        </div>
+      </div>
 
-            <Popover open={showCustomRange} onOpenChange={setShowCustomRange}>
-              <PopoverTrigger asChild>
-                <div></div>
-              </PopoverTrigger>
-              <PopoverContent
-                className={`w-auto p-0 ${
-                  theme === "dark"
-                    ? "bg-slate-800 border-slate-700"
-                    : "bg-white border-gray-200"
-                }`}
-                align="start"
-              >
-                <CalendarComponent
-                  initialFocus
-                  mode="range"
-                  defaultMonth={dateRange?.from}
-                  selected={dateRange}
-                  onSelect={handleDateRangeSelect}
-                  numberOfMonths={2}
-                  className={`${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  } pointer-events-auto`}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div>
-            <label
-              className={`text-sm mb-2 block ${
-                theme === "dark" ? "text-slate-300" : "text-gray-700"
-              }`}
-            >
-              Lead Quality
-            </label>
+      {/* Filter Bar */}
+      <div className="grid grid-cols-4 gap-4 mb-6">
+        <div>
+          <label
+            className={`text-sm mb-2 block ${
+              theme === "dark" ? "text-slate-300" : "text-gray-700"
+            }`}
+          >
+            Date Range
+          </label>
+          <div className="relative">
             <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
+              value={selectedDateOption}
+              onChange={(e) => handleDateOptionChange(e.target.value)}
+              className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-border text-foreground w-full"
             >
+              {dateOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-foreground" />
+          </div>
+          <Popover open={showCustomRange} onOpenChange={setShowCustomRange}>
+            <PopoverTrigger asChild>
+              <div></div>
+            </PopoverTrigger>
+            <PopoverContent
+              className={`w-auto p-0 ${
+                theme === "dark"
+                  ? "bg-slate-800 border-slate-700"
+                  : "bg-white border-gray-200"
+              }`}
+              align="start"
+            >
+              <CalendarComponent
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange?.from}
+                selected={dateRange}
+                onSelect={handleDateRangeSelect}
+                numberOfMonths={2}
+                className={`${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                } pointer-events-auto`}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div>
+          <label
+            className={`text-sm mb-2 block ${
+              theme === "dark" ? "text-slate-300" : "text-gray-700"
+            }`}
+          >
+            Lead Type
+          </label>
+          <div className="relative">
+            <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-border text-foreground w-full">
               <option>All Leads</option>
               <option>Active Leads</option>
               <option>Interested Leads</option>
             </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-foreground" />
           </div>
-          <div>
-            <label
-              className={`text-sm mb-2 block ${
-                theme === "dark" ? "text-slate-300" : "text-gray-700"
-              }`}
-            >
-              Channel Source
-            </label>
-            <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-            >
+        </div>
+        <div>
+          <label
+            className={`text-sm mb-2 block ${
+              theme === "dark" ? "text-slate-300" : "text-gray-700"
+            }`}
+          >
+            Channel Source
+          </label>
+          <div className="relative">
+            <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-border text-foreground w-full">
               <option>All Channels</option>
               <option>WhatsApp</option>
               <option>Website</option>
             </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-foreground" />
           </div>
-          <div>
-            <label
-              className={`text-sm mb-2 block ${
-                theme === "dark" ? "text-slate-300" : "text-gray-700"
-              }`}
-            >
-              Lead Status
-            </label>
-            <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-            >
+        </div>
+        <div>
+          <label
+            className={`text-sm mb-2 block ${
+              theme === "dark" ? "text-slate-300" : "text-gray-700"
+            }`}
+          >
+            Lead Status
+          </label>
+          <div className="relative">
+            <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-border text-foreground w-full">
               <option>All Status</option>
               <option>Active</option>
               <option>Interested</option>
               <option>Passive</option>
             </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none text-foreground" />
           </div>
         </div>
-        <div className="flex items-center mt-4 space-x-4">
-          <Button
-            variant="outline"
-            size="sm"
-            className={
-              theme === "dark"
-                ? "bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-            }
-          >
-            Reset All
-          </Button>
-        </div>
+      </div>
+      <div className="mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          className={
+            theme === "dark"
+              ? "bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+              : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+          }
+        >
+          Reset All
+        </Button>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         {kpiData.map((kpi, index) => {
           const IconComponent = kpi.icon;
           return (
             <div
               key={index}
-              className={`${
-                theme === "dark"
-                  ? "bg-slate-800/90 border-slate-700/50 hover:border-slate-600/50"
-                  : "bg-white border-gray-200 hover:border-gray-300"
-              } border rounded-xl p-6 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group`}
+              className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div
                   className={`p-2 rounded-lg ${
                     theme === "dark"
@@ -662,25 +664,16 @@ const ChatAnalytics = () => {
                 >
                   <IconComponent className="w-5 h-5" />
                 </div>
-                <div className="text-right">
-                  <span
-                    className={`text-sm font-medium px-2 py-1 rounded-md ${
-                      kpi.positive
-                        ? "text-green-400 bg-green-500/10"
-                        : "text-red-400 bg-red-500/10"
-                    }`}
-                  >
-                    {kpi.positive ? "▲" : "▼"}
-                    {kpi.changeValue}
-                  </span>
-                  <p
-                    className={`text-xs mt-1 ${
-                      theme === "dark" ? "text-slate-400" : "text-gray-500"
-                    }`}
-                  >
-                    vs last week
-                  </p>
-                </div>
+                <span
+                  className={`text-sm font-medium px-2 py-1 rounded-md ${
+                    kpi.positive
+                      ? "text-green-400 bg-green-500/10"
+                      : "text-red-400 bg-red-500/10"
+                  }`}
+                >
+                  {kpi.positive ? "▲" : "▼"}
+                  {kpi.changeValue}
+                </span>
               </div>
               <h3
                 className={`text-sm mb-2 transition-colors ${
@@ -700,25 +693,28 @@ const ChatAnalytics = () => {
               >
                 {kpi.value}
               </p>
+              <p
+                className={`text-xs mt-1 ${
+                  theme === "dark" ? "text-slate-400" : "text-gray-500"
+                }`}
+              >
+                vs last week
+              </p>
             </div>
           );
         })}
       </div>
 
       {/* Additional Metrics */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         {additionalMetrics.map((metric, index) => {
           const IconComponent = metric.icon;
           return (
             <div
               key={index}
-              className={`${
-                theme === "dark"
-                  ? "bg-slate-800/90 border-slate-700/50 hover:border-slate-600/50"
-                  : "bg-white border-gray-200 hover:border-gray-300"
-              } border rounded-xl p-6 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group`}
+              className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div
                   className={`p-2 rounded-lg ${
                     theme === "dark"
@@ -728,25 +724,16 @@ const ChatAnalytics = () => {
                 >
                   <IconComponent className="w-5 h-5" />
                 </div>
-                <div className="text-right">
-                  <span
-                    className={`text-sm font-medium px-2 py-1 rounded-md ${
-                      metric.positive
-                        ? "text-green-400 bg-green-500/10"
-                        : "text-red-400 bg-red-500/10"
-                    }`}
-                  >
-                    {metric.positive ? "▲" : "▼"}
-                    {metric.changeValue}
-                  </span>
-                  <p
-                    className={`text-xs mt-1 ${
-                      theme === "dark" ? "text-slate-400" : "text-gray-500"
-                    }`}
-                  >
-                    vs last week
-                  </p>
-                </div>
+                <span
+                  className={`text-sm font-medium px-2 py-1 rounded-md ${
+                    metric.positive
+                      ? "text-green-400 bg-green-500/10"
+                      : "text-red-400 bg-red-500/10"
+                  }`}
+                >
+                  {metric.positive ? "▲" : "▼"}
+                  {metric.changeValue}
+                </span>
               </div>
               <h3
                 className={`text-sm mb-2 transition-colors ${
@@ -766,6 +753,13 @@ const ChatAnalytics = () => {
               >
                 {metric.value}
               </p>
+              <p
+                className={`text-xs mt-1 ${
+                  theme === "dark" ? "text-slate-400" : "text-gray-500"
+                }`}
+              >
+                vs last week
+              </p>
             </div>
           );
         })}
@@ -773,191 +767,103 @@ const ChatAnalytics = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-2 gap-6">
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Leads Over Time
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadsOverTime === "line" ? "default" : "outline"
-                }
-                onClick={() =>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Leads Over Time
+              </h3>
+              <InfoIcon description="Volume trends in lead generation over a selected period" />
+            </div>
+            <div className="relative">
+              <select
+                value={chartViews.leadsOverTime}
+                onChange={(e) =>
                   setChartViews((prev) => ({
                     ...prev,
-                    leadsOverTime: "line",
+                    leadsOverTime: e.target.value,
                   }))
                 }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
+                className="appearance-none bg-background border border-border rounded px-3 py-1 pr-8 text-sm text-foreground"
               >
-                <LineChartIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadsOverTime === "bar" ? "default" : "outline"
-                }
-                onClick={() =>
-                  setChartViews((prev) => ({
-                    ...prev,
-                    leadsOverTime: "bar",
-                  }))
-                }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
-              >
-                <BarChart3 className="w-4 h-4" />
-              </Button>
+                <option value="line">Line Chart</option>
+                <option value="bar">Bar Chart</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
             </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart(chartViews.leadsOverTime, leadsOverTimeData, "leads")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Lead Quality Distribution
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadQuality === "pie" ? "default" : "outline"
-                }
-                onClick={() =>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Lead Quality Distribution
+              </h3>
+              <InfoIcon description="Spread of Passive, Interested, and Active leads" />
+            </div>
+            <div className="relative">
+              <select
+                value={chartViews.leadQuality}
+                onChange={(e) =>
                   setChartViews((prev) => ({
                     ...prev,
-                    leadQuality: "pie",
+                    leadQuality: e.target.value,
                   }))
                 }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
+                className="appearance-none bg-background border border-border rounded px-3 py-1 pr-8 text-sm text-foreground"
               >
-                <PieChartIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadQuality === "bar" ? "default" : "outline"
-                }
-                onClick={() =>
-                  setChartViews((prev) => ({
-                    ...prev,
-                    leadQuality: "bar",
-                  }))
-                }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
-              >
-                <BarChart3 className="w-4 h-4" />
-              </Button>
+                <option value="pie">Pie Chart</option>
+                <option value="bar">Bar Chart</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
             </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart(chartViews.leadQuality, leadQualityData, "value")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Intent vs Budget Heatmap
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Intent vs Budget Heatmap
+              </h3>
+              <InfoIcon description="Correlation of lead intent vs stated budget" />
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart("scatter", intentBudgetData, "leads", "intentBudget")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Inbound vs Outbound vs Customers Source Chart
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                size="sm"
-                variant={
-                  chartViews.sourceChart === "pie" ? "default" : "outline"
-                }
-                onClick={() =>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="text-lg font-semibold text-foreground">
+                Inbound vs Outbound vs Customers Source Chart
+              </h3>
+              <InfoIcon
+                description="Breakdown of Inbound, Outbound, Customer leads"
+                className="flex-shrink-0"
+              />
+            </div>
+            <div className="relative">
+              <select
+                value={chartViews.sourceChart}
+                onChange={(e) =>
                   setChartViews((prev) => ({
                     ...prev,
-                    sourceChart: "pie",
+                    sourceChart: e.target.value,
                   }))
                 }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
+                className="appearance-none bg-background border border-border rounded px-3 py-1 pr-8 text-sm text-foreground"
               >
-                <PieChartIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  chartViews.sourceChart === "bar" ? "default" : "outline"
-                }
-                onClick={() =>
-                  setChartViews((prev) => ({
-                    ...prev,
-                    sourceChart: "bar",
-                  }))
-                }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
-              >
-                <BarChart3 className="w-4 h-4" />
-              </Button>
+                <option value="pie">Pie Chart</option>
+                <option value="bar">Bar Chart</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
             </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>

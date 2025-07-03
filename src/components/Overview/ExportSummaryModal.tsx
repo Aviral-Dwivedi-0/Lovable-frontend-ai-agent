@@ -16,8 +16,16 @@ import { useState } from "react";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
 
-export default function ExportSummaryModal({ open, onClose, dateRange }) {
+export default function ExportSummaryModal({
+  open,
+  onClose,
+  dateRange,
+  kpis = [],
+  leadsOverTimeData = [],
+  interactionsOverTimeData = [],
+}) {
   const [exportFormat, setExportFormat] = useState("csv");
   const [exporting, setExporting] = useState(false);
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
@@ -26,12 +34,83 @@ export default function ExportSummaryModal({ open, onClose, dateRange }) {
   const [toCalendarOpen, setToCalendarOpen] = useState(false);
   const { theme } = useTheme();
 
+  const generateCSV = () => {
+    let csv = "KPI,Value,Delta,Compare\n";
+    kpis.forEach((kpi) => {
+      csv += `"${kpi.label}","${kpi.value}","${kpi.delta}","${kpi.compare}"\n`;
+    });
+    csv += "\nLeads Over Time\nDate,Total,Chat Leads,Call Leads\n";
+    leadsOverTimeData.forEach((item) => {
+      csv += `"${item.date}","${item.total}","${item.chatLeads}","${item.callLeads}"\n`;
+    });
+    csv += "\nInteractions Over Time\nDate,Total,Chat,Call\n";
+    interactionsOverTimeData.forEach((item) => {
+      csv += `"${item.date}","${item.total}","${item.chat}","${item.call}"\n`;
+    });
+    return csv;
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Overview Summary", 10, 10);
+    let y = 20;
+    doc.setFontSize(12);
+    doc.text("KPIs:", 10, y);
+    y += 8;
+    kpis.forEach((kpi) => {
+      doc.text(
+        `${kpi.label}: ${kpi.value} (${kpi.delta > 0 ? "+" : ""}${kpi.delta}%)`,
+        10,
+        y
+      );
+      y += 7;
+    });
+    y += 5;
+    doc.text("Leads Over Time:", 10, y);
+    y += 8;
+    leadsOverTimeData.forEach((item) => {
+      doc.text(
+        `${item.date}: ${item.total} (Chat: ${item.chatLeads}, Call: ${item.callLeads})`,
+        10,
+        y
+      );
+      y += 7;
+    });
+    y += 5;
+    doc.text("Interactions Over Time:", 10, y);
+    y += 8;
+    interactionsOverTimeData.forEach((item) => {
+      doc.text(
+        `${item.date}: ${item.total} (Chat: ${item.chat}, Call: ${item.call})`,
+        10,
+        y
+      );
+      y += 7;
+    });
+    doc.save("overview-summary.pdf");
+  };
+
   const handleDownload = () => {
     setExporting(true);
     setTimeout(() => {
+      if (exportFormat === "csv") {
+        const csv = generateCSV();
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "overview-summary.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else if (exportFormat === "pdf") {
+        generatePDF();
+      }
       setExporting(false);
       onClose();
-    }, 1000); // Simulate file download
+    }, 1000);
   };
 
   return (

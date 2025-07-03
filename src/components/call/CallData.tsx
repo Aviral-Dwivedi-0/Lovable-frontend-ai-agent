@@ -171,9 +171,31 @@ interface Filters {
   engagementLevel: number[];
 }
 
+interface Lead {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  platform: string;
+  leadType: string;
+  businessType: string;
+  useCase: string;
+  leadTag: string;
+  duration: string;
+  engagementLevel: string;
+  intentLevel: string;
+  budgetConstraint: string;
+  timelineUrgency: string;
+  followUpScheduled: string;
+  demoScheduled: string;
+  agent: string;
+  interactionDate: string;
+  isLatestInteraction: boolean;
+}
+
 interface CallDataProps {
   onNavigateToLogs?: () => void;
-  onOpenProfile?: (lead: any) => void;
+  onOpenProfile?: (lead: Lead) => void;
 }
 
 const CallData = ({
@@ -181,7 +203,7 @@ const CallData = ({
   onOpenProfile,
 }: {
   onNavigateToLogs: () => void;
-  onOpenProfile?: (lead: any) => void;
+  onOpenProfile?: (lead: Lead) => void;
 }) => {
   const { theme } = useTheme();
 
@@ -210,7 +232,7 @@ const CallData = ({
   const [showFilterPanel, setShowFilterPanel] = useState(false);
   const [currentLeadId, setCurrentLeadId] = useState("");
   const [showCallingModal, setShowCallingModal] = useState(false);
-  const [callingLead, setCallingLead] = useState<any>(null);
+  const [callingLead, setCallingLead] = useState<Lead | null>(null);
   const [showTranscriptModal, setShowTranscriptModal] = useState(false);
   const [selectedTranscriptId, setSelectedTranscriptId] = useState<
     string | null
@@ -537,7 +559,7 @@ const CallData = ({
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`pl-10 ${
                 theme === "dark"
-                  ? "bg-transparent border-gray-600 text-white"
+                  ? "bg-[#020817] border-gray-600 text-white"
                   : "bg-transparent border-gray-300 text-gray-900"
               }`}
             />
@@ -708,8 +730,8 @@ const CallData = ({
         <div
           className={`rounded-lg border overflow-hidden ${
             theme === "dark"
-              ? "border-gray-700 bg-gray-800"
-              : "border-gray-200 bg-white"
+              ? "border-gray-700 bg-[#020817]"
+              : "border-gray-200"
           }`}
         >
           <div className="overflow-x-auto">

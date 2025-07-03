@@ -564,7 +564,7 @@ const ChatData = ({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={`pl-10 ${
                     theme === "dark"
-                      ? "bg-transparent border-gray-600 text-white"
+                      ? "bg-[#020817] border-gray-600 text-white"
                       : "bg-transparent border-gray-300 text-gray-900"
                   }`}
                 />
@@ -684,8 +684,8 @@ const ChatData = ({
           <div
             className={`rounded-lg border overflow-hidden ${
               theme === "dark"
-                ? "border-gray-700 bg-gray-800"
-                : "border-gray-200 bg-white"
+                ? "border-gray-700 bg-[#020817]"
+                : "border-gray-200"
             }`}
           >
             <div className="overflow-x-auto">

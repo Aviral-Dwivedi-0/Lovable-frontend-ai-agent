@@ -16,6 +16,14 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import React from "react";
 
 const initialAgents = [
   {
@@ -77,6 +85,17 @@ export default function AgentManager({ agents, setAgents }) {
   // Use initial agents if no agents provided
   const displayAgents = agents.length > 0 ? agents : initialAgents;
 
+  // Custom Edit Agent Modal (replaces AgentModal)
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  // Sync modal fields when opening
+  React.useEffect(() => {
+    if (modalOpen && editAgent) {
+      setEditName(editAgent.name || "");
+      setEditDescription(editAgent.description || "");
+    }
+  }, [modalOpen, editAgent]);
+
   const handleSaveAgent = (agent) => {
     if (agent.id) {
       setAgents((a) => a.map((ag) => (ag.id === agent.id ? agent : ag)));
@@ -119,6 +138,19 @@ export default function AgentManager({ agents, setAgents }) {
       ...prev,
       [agentId]: !prev[agentId],
     }));
+  };
+
+  const handleSaveEditAgent = () => {
+    if (!editAgent) return;
+    setAgents((prev) =>
+      prev.map((ag) =>
+        ag.id === editAgent.id
+          ? { ...ag, name: editName, description: editDescription }
+          : ag
+      )
+    );
+    setModalOpen(false);
+    setEditAgent(null);
   };
 
   const filteredAgents = displayAgents.filter((agent) => {
@@ -410,16 +442,65 @@ export default function AgentManager({ agents, setAgents }) {
           )}
         </div>
       </div>
-      {modalOpen && (
-        <AgentModal
-          open={modalOpen}
-          agent={editAgent}
-          onClose={() => {
-            setModalOpen(false);
-            setEditAgent(null);
-          }}
-          onSave={handleSaveAgent}
-        />
+      {modalOpen && editAgent && (
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Edit Agent</DialogTitle>
+              <p className="text-muted-foreground mb-4">
+                Update name and description of this AI agent.
+              </p>
+            </DialogHeader>
+            {/* Agent Name */}
+            <label className="block text-sm font-medium mb-1">Agent Name</label>
+            <Input
+              value={editName}
+              maxLength={30}
+              onChange={(e) => setEditName(e.target.value)}
+            />
+            <div className="text-xs text-right mb-2">{editName.length}/30</div>
+            {/* Agent Type & Language (fixed) */}
+            <div className="flex gap-4 mb-2">
+              <div className="flex-1">
+                <label className="block text-xs mb-1">Agent Type (fixed)</label>
+                <Input value={editAgent.type} disabled />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs mb-1">Language (fixed)</label>
+                <Input value={editAgent.language} disabled />
+              </div>
+            </div>
+            {/* Description */}
+            <label className="block text-sm font-medium mb-1">
+              Description (max 150 chars)
+            </label>
+            <textarea
+              className="w-full rounded border bg-background text-foreground p-2"
+              value={editDescription}
+              maxLength={150}
+              rows={4}
+              onChange={(e) => setEditDescription(e.target.value)}
+            />
+            <div className="text-xs text-right mb-2">
+              {editDescription.length}/150
+            </div>
+            {/* Buttons */}
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="px-4 py-2 rounded border border-border bg-background text-foreground hover:bg-muted"
+                onClick={() => setModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-white text-black"
+                onClick={handleSaveEditAgent}
+              >
+                Save
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
       {deleteAgent && (
         <DeleteAgentModal

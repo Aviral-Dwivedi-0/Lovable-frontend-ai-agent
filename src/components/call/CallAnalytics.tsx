@@ -43,6 +43,9 @@ import {
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import type { TooltipProps } from "recharts";
+import { InfoIcon } from "@/components/ui/info-icon";
+
 const CALL_ANALYTICS_COLORS = [
   "#1A6262",
   "#91C499",
@@ -50,6 +53,25 @@ const CALL_ANALYTICS_COLORS = [
   "#FF6700",
   "#a855f7",
 ];
+
+interface TooltipEntry {
+  name: string;
+  value: number;
+  color?: string;
+  [key: string]: unknown;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipEntry[];
+  label?: string;
+}
+
+interface CustomScatterTooltipProps {
+  active?: boolean;
+  payload?: TooltipEntry[];
+}
+
 const CallAnalytics = () => {
   const { theme } = useTheme();
   const [chartViews, setChartViews] = useState({
@@ -292,7 +314,7 @@ const CallAnalytics = () => {
       color: CALL_ANALYTICS_COLORS[1],
     },
   ];
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
         <div
@@ -309,9 +331,9 @@ const CallAnalytics = () => {
           >
             {label}
           </p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry: TooltipEntry) => (
             <p
-              key={index}
+              key={entry.name}
               style={{
                 color: entry.color,
               }}
@@ -325,9 +347,17 @@ const CallAnalytics = () => {
     }
     return null;
   };
-  const CustomScatterTooltip = ({ active, payload }: any) => {
+  const CustomScatterTooltip = ({
+    active,
+    payload,
+  }: CustomScatterTooltipProps) => {
     if (active && payload && payload.length) {
-      const data = payload[0].payload;
+      const data = payload[0].payload as {
+        name: string;
+        intent: number;
+        budget: number;
+        leads: number;
+      };
       return (
         <div
           className={`p-3 rounded-lg border shadow-lg ${
@@ -371,14 +401,21 @@ const CallAnalytics = () => {
   };
   const renderChart = (
     type: string,
-    data: any,
+    data: unknown[],
     dataKey: string,
     chartType?: string
   ) => {
     if (chartType === "intentBudget") {
       return (
         <ScatterChart
-          data={data}
+          data={
+            data as {
+              intent: number;
+              budget: number;
+              leads: number;
+              name: string;
+            }[]
+          }
           margin={{ top: 20, right: 30, left: 40, bottom: 60 }}
         >
           <CartesianGrid
@@ -499,10 +536,15 @@ const CallAnalytics = () => {
               cy="45%"
               outerRadius={100}
               dataKey="value"
-              label={({ name, value }) => `${name} ${value}%`}
+              label={({ name, value }: { name: string; value: number }) =>
+                `${name} ${value}%`
+              }
             >
-              {data.map((entry: any, index: number) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={(entry as TooltipEntry).color}
+                />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -529,11 +571,7 @@ const CallAnalytics = () => {
               <select
                 value={selectedDateOption}
                 onChange={(e) => handleDateOptionChange(e.target.value)}
-                className={`w-full rounded-lg px-3 py-2 appearance-none pr-8 border ${
-                  theme === "dark"
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-black"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600 w-full"
               >
                 {dateOptions.map((option) => (
                   <option key={option} value={option}>
@@ -578,17 +616,14 @@ const CallAnalytics = () => {
             >
               Call Status
             </label>
-            <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-            >
-              <option>All Calls</option>
-              <option>Connected</option>
-              <option>Missed</option>
-            </select>
+            <div className="relative">
+              <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600 w-full">
+                <option>All Calls</option>
+                <option>Connected</option>
+                <option>Missed</option>
+              </select>
+              <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400" />
+            </div>
           </div>
           <div>
             <label
@@ -598,17 +633,14 @@ const CallAnalytics = () => {
             >
               Channel Source
             </label>
-            <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-            >
-              <option>All Channels</option>
-              <option>Phone</option>
-              <option>VoIP</option>
-            </select>
+            <div className="relative">
+              <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600 w-full">
+                <option>All Channels</option>
+                <option>Phone</option>
+                <option>VoIP</option>
+              </select>
+              <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400" />
+            </div>
           </div>
           <div>
             <label
@@ -618,17 +650,14 @@ const CallAnalytics = () => {
             >
               Call Type
             </label>
-            <select
-              className={`w-full rounded-lg px-3 py-2 border ${
-                theme === "dark"
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-black"
-              }`}
-            >
-              <option>All Types</option>
-              <option>Inbound</option>
-              <option>Outbound</option>
-            </select>
+            <div className="relative">
+              <select className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600 w-full">
+                <option>All Types</option>
+                <option>Inbound</option>
+                <option>Outbound</option>
+              </select>
+              <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400" />
+            </div>
           </div>
         </div>
         <div className="flex items-center mt-4 space-x-4">
@@ -653,11 +682,7 @@ const CallAnalytics = () => {
           return (
             <div
               key={index}
-              className={`${
-                theme === "dark"
-                  ? "bg-slate-800/90 border-slate-700/50 hover:border-slate-600/50"
-                  : "bg-white border-gray-200 hover:border-gray-300"
-              } border rounded-xl p-6 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group`}
+              className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
             >
               <div className="flex items-start justify-between mb-4">
                 <div
@@ -713,19 +738,15 @@ const CallAnalytics = () => {
       </div>
 
       {/* Additional Metrics */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         {additionalMetrics.map((metric, index) => {
           const IconComponent = metric.icon;
           return (
             <div
               key={index}
-              className={`${
-                theme === "dark"
-                  ? "bg-slate-800/90 border-slate-700/50 hover:border-slate-600/50"
-                  : "bg-white border-gray-200 hover:border-gray-300"
-              } border rounded-xl p-6 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 cursor-pointer group`}
+              className="bg-card border border-border rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div
                   className={`p-2 rounded-lg ${
                     theme === "dark"
@@ -735,25 +756,16 @@ const CallAnalytics = () => {
                 >
                   <IconComponent className="w-5 h-5" />
                 </div>
-                <div className="text-right">
-                  <span
-                    className={`text-sm font-medium px-2 py-1 rounded-md ${
-                      metric.positive
-                        ? "text-green-400 bg-green-500/10"
-                        : "text-red-400 bg-red-500/10"
-                    }`}
-                  >
-                    {metric.positive ? "▲" : "▼"}
-                    {metric.changeValue}
-                  </span>
-                  <p
-                    className={`text-xs mt-1 ${
-                      theme === "dark" ? "text-slate-400" : "text-gray-500"
-                    }`}
-                  >
-                    vs last week
-                  </p>
-                </div>
+                <span
+                  className={`text-sm font-medium px-2 py-1 rounded-md ${
+                    metric.positive
+                      ? "text-green-400 bg-green-500/10"
+                      : "text-red-400 bg-red-500/10"
+                  }`}
+                >
+                  {metric.positive ? "▲" : "▼"}
+                  {metric.changeValue}
+                </span>
               </div>
               <h3
                 className={`text-sm mb-2 transition-colors ${
@@ -773,6 +785,13 @@ const CallAnalytics = () => {
               >
                 {metric.value}
               </p>
+              <p
+                className={`text-xs mt-1 ${
+                  theme === "dark" ? "text-slate-400" : "text-gray-500"
+                }`}
+              >
+                vs last week
+              </p>
             </div>
           );
         })}
@@ -780,155 +799,84 @@ const CallAnalytics = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-2 gap-6">
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Lead Quality Distribution
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadQuality === "pie" ? "default" : "outline"
-                }
-                onClick={() =>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Lead Quality Distribution
+              </h3>
+              <InfoIcon description="Distribution of lead quality based on call outcomes and engagement" />
+            </div>
+            <div className="relative">
+              <select
+                value={chartViews.leadQuality}
+                onChange={(e) =>
                   setChartViews((prev) => ({
                     ...prev,
-                    leadQuality: "pie",
+                    leadQuality: e.target.value,
                   }))
                 }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
+                className="appearance-none bg-background border border-border rounded px-3 py-1 pr-8 text-sm text-foreground"
               >
-                <PieChartIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  chartViews.leadQuality === "bar" ? "default" : "outline"
-                }
-                onClick={() =>
-                  setChartViews((prev) => ({
-                    ...prev,
-                    leadQuality: "bar",
-                  }))
-                }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
-              >
-                <BarChart3 className="w-4 h-4" />
-              </Button>
+                <option value="pie">Pie Chart</option>
+                <option value="bar">Bar Chart</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
             </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart(chartViews.leadQuality, leadQualityData, "value")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Funnel Drop-off
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Funnel Drop-off
+              </h3>
+              <InfoIcon description="Conversion funnel showing drop-off rates at each stage of the calling process" />
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart("funnel", funnelData, "value", "funnel")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Intent vs Budget Heatmap
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Intent vs Budget Heatmap
+              </h3>
+              <InfoIcon description="Correlation between prospect intent level and budget constraints from call data" />
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>
             {renderChart("scatter", intentBudgetData, "leads", "intentBudget")}
           </ResponsiveContainer>
         </div>
-
-        <div
-          className={`${
-            theme === "dark"
-              ? "bg-slate-800/90 border-slate-700/50"
-              : "bg-white border-gray-200"
-          } border rounded-xl p-6`}
-        >
+        <div className="bg-card border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3
-              className={`text-lg font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Inbound vs Outbound Source Chart
-            </h3>
-            <div className="flex space-x-2">
-              <Button
-                size="sm"
-                variant={
-                  chartViews.sourceChart === "pie" ? "default" : "outline"
-                }
-                onClick={() =>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">
+                Inbound vs Outbound Source Chart
+              </h3>
+              <InfoIcon description="Breakdown of leads by inbound calls vs outbound call campaigns" />
+            </div>
+            <div className="relative">
+              <select
+                value={chartViews.sourceChart}
+                onChange={(e) =>
                   setChartViews((prev) => ({
                     ...prev,
-                    sourceChart: "pie",
+                    sourceChart: e.target.value,
                   }))
                 }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
+                className="appearance-none bg-background border border-border rounded px-3 py-1 pr-8 text-sm text-foreground"
               >
-                <PieChartIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  chartViews.sourceChart === "bar" ? "default" : "outline"
-                }
-                onClick={() =>
-                  setChartViews((prev) => ({
-                    ...prev,
-                    sourceChart: "bar",
-                  }))
-                }
-                className={
-                  theme === "dark" ? "bg-slate-700 hover:bg-slate-600" : ""
-                }
-              >
-                <BarChart3 className="w-4 h-4" />
-              </Button>
+                <option value="pie">Pie Chart</option>
+                <option value="bar">Bar Chart</option>
+              </select>
+              <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 pointer-events-none" />
             </div>
           </div>
           <ResponsiveContainer width="100%" height={340}>

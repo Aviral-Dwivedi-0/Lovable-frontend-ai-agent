@@ -5,11 +5,12 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 import ChatLogs from "@/components/chat/ChatLogs";
 import ChatAnalytics from "@/components/chat/ChatAnalytics";
 import ChatData from "@/components/chat/ChatData";
+import type { Lead } from "@/pages/Dashboard";
 
 interface ChatAgentProps {
   activeSubTab: string;
   setActiveSubTab: (subTab: string) => void;
-  onOpenProfile?: (lead: any) => void;
+  onOpenProfile?: (lead: Lead) => void;
 }
 
 const ChatAgent = ({
@@ -70,46 +71,6 @@ const ChatAgent = ({
         theme === "dark" ? "bg-black" : "bg-gray-50"
       }`}
     >
-      {/* Top Info Section */}
-      <div
-        className={`p-6 sticky top-0 z-10 ${
-          theme === "dark" ? "bg-black" : "bg-gray-50"
-        }`}
-      >
-        <div className="flex items-center justify-between">
-          <h1
-            className={`text-2xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}
-          >
-            SniperThink AI Chat Agent
-          </h1>
-          <div className="flex items-center space-x-4">
-            <span
-              className={theme === "dark" ? "text-slate-300" : "text-gray-600"}
-            >
-              Credits Remaining:
-            </span>
-            <span
-              className={`font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {credits}/500
-            </span>
-            {showBuyCredits && (
-              <Button
-                size="sm"
-                style={{ backgroundColor: "#1A6262" }}
-                className="hover:opacity-90 text-white"
-              >
-                Purchase More Credits
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Sub-tab content */}
       {renderSubTabContent()}
     </div>

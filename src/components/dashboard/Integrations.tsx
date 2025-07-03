@@ -17,6 +17,13 @@ import {
 } from "@/components/ui/select";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { toast } from "sonner";
+
+type FormField = {
+  name: string;
+  type: string;
+  required: boolean;
+};
+
 const Integrations = () => {
   const { theme } = useTheme();
   const [showDataModal, setShowDataModal] = useState(false);
@@ -114,7 +121,7 @@ const Integrations = () => {
       ],
     }));
   };
-  const updateFormField = (index: number, field: any) => {
+  const updateFormField = (index: number, field: FormField) => {
     setFormData((prev) => ({
       ...prev,
       fields: prev.fields.map((f, i) => (i === index ? field : f)),
@@ -125,6 +132,69 @@ const Integrations = () => {
       ...prev,
       fields: prev.fields.filter((_, i) => i !== index),
     }));
+  };
+  const downloadSampleTemplate = () => {
+    const sampleData = [
+      [
+        "Name",
+        "Email",
+        "Phone",
+        "Lead Type",
+        "Lead Tag",
+        "Business Type",
+        "Engagement Level",
+        "Intent Level",
+        "Budget Constraint",
+        "Timeline Urgency",
+      ],
+      [
+        "John Doe",
+        "john@example.com",
+        "+1234567890",
+        "Inbound",
+        "Hot",
+        "SaaS",
+        "High",
+        "High",
+        "Medium",
+        "High",
+      ],
+      [
+        "Jane Smith",
+        "jane@example.com",
+        "+0987654321",
+        "Outbound",
+        "Warm",
+        "E-commerce",
+        "Medium",
+        "Medium",
+        "High",
+        "Medium",
+      ],
+      [
+        "Mike Johnson",
+        "mike@example.com",
+        "+1122334455",
+        "Customer",
+        "Cold",
+        "Fintech",
+        "Low",
+        "Low",
+        "Low",
+        "Low",
+      ],
+    ];
+    const csvContent = sampleData.map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lead_data_template.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    toast.success("Sample template downloaded successfully");
   };
   return (
     <div
@@ -411,7 +481,7 @@ const Integrations = () => {
                     }`}
                   />
                   <p
-                    className={`text-sm mb-2 ${
+                    className={`text-sm ${
                       theme === "dark" ? "text-slate-300" : "text-gray-600"
                     }`}
                   >
@@ -420,16 +490,6 @@ const Integrations = () => {
                   <Button variant="outline" size="sm" className="mb-3">
                     Browse Files
                   </Button>
-                  <div className="text-xs">
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="text-blue-600 p-0 h-auto"
-                    >
-                      <Download className="w-3 h-3 mr-1" />
-                      Download Template
-                    </Button>
-                  </div>
                 </div>
               </div>
 
@@ -499,7 +559,7 @@ const Integrations = () => {
             <Button
               size="sm"
               onClick={() => setShowDataModal(true)}
-              className="w-full bg-blue-500 hover:bg-blue-600"
+              className="w-full bg-[#374151] hover:bg-[#4B5563] text-[#CBD5E1]"
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload Data
@@ -535,7 +595,7 @@ const Integrations = () => {
             <Button
               size="sm"
               onClick={() => setShowFormModal(true)}
-              className="w-full bg-green-500 hover:bg-green-600"
+              className="w-full bg-[#374151] hover:bg-[#4B5563] text-[#CBD5E1]"
             >
               <FileText className="w-4 h-4 mr-2" />
               Create Form
@@ -675,6 +735,13 @@ const Integrations = () => {
                 Browse Files
               </Button>
             </div>
+            <a
+              onClick={downloadSampleTemplate}
+              className="text-blue-600 underline text-sm mt-2 block text-left cursor-pointer"
+              style={{ minWidth: 120 }}
+            >
+              Download Template
+            </a>
 
             <div className="flex justify-end space-x-2">
               <Button
@@ -690,7 +757,7 @@ const Integrations = () => {
               </Button>
               <Button
                 onClick={handleDataUpload}
-                className="bg-blue-500 hover:bg-blue-600"
+                className="bg-[#374151] hover:bg-[#4B5563] text-[#CBD5E1]"
               >
                 Upload Data
               </Button>
@@ -905,7 +972,7 @@ const Integrations = () => {
               </Button>
               <Button
                 onClick={handleFormCreate}
-                className="bg-green-500 hover:bg-green-600"
+                className="bg-[#374151] hover:bg-[#4B5563] text-[#CBD5E1]"
               >
                 Create Form
               </Button>

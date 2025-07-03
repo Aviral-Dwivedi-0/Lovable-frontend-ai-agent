@@ -30,6 +30,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-groups";
 import type { Lead } from "@/components/agents/AgentModal";
 import type { TimelineEntry } from "@/pages/Dashboard";
+import { InfoIcon } from "@/components/ui/info-icon";
 
 // Consistent color palette
 const COLORS = ["#1A6262", "#91C499", "#E1A940", "#FF6700", "#6366f1"];
@@ -671,7 +672,8 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             )}
           </AreaChart>
         );
-      case "bar":
+      case "bar": {
+        console.log("BarChart data:", data, "chartKey:", chartKey);
         return (
           <BarChart data={data}>
             <CartesianGrid
@@ -699,10 +701,10 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
               label={{
                 value:
                   chartKey === "leadQuality"
-                    ? "Lead Quality Category"
+                    ? ""
                     : chartKey === "interactionsToConvert"
-                    ? "Number of Interactions"
-                    : "Time Period",
+                    ? ""
+                    : "",
                 position: "insideBottom",
                 offset: -25,
               }}
@@ -727,14 +729,11 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             />
             <ReTooltip content={<CustomTooltip />} />
             <Legend />
+            {/* Always show both bars for debugging */}
             {chartKey === "interactionsToConvert" && (
               <>
-                {(filter === "both" || filter === "chat") && (
-                  <Bar dataKey="chatCount" fill={COLORS[0]} name="Chat" />
-                )}
-                {(filter === "both" || filter === "call") && (
-                  <Bar dataKey="callCount" fill={COLORS[1]} name="Call" />
-                )}
+                <Bar dataKey="chatCount" fill={COLORS[0]} name="Chat" />
+                <Bar dataKey="callCount" fill={COLORS[1]} name="Call" />
               </>
             )}
             {chartKey === "timeToConvert" && (
@@ -742,9 +741,8 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             )}
             {chartKey === "leadQuality" && (
               <>
-                {filter === "chat" && (
-                  <Bar dataKey="chatCount" fill={COLORS[0]} name="Chat Leads" />
-                )}
+                <Bar dataKey="chatCount" fill={COLORS[0]} name="Chat Leads" />
+                <Bar dataKey="callCount" fill={COLORS[1]} name="Call Leads" />
               </>
             )}
             {chartKey === "engagementFunnel" && (
@@ -752,6 +750,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             )}
           </BarChart>
         );
+      }
       case "pie":
         const pieData =
           chartKey === "leadQuality"
@@ -848,7 +847,8 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             </FunnelChart>
           </ResponsiveContainer>
         );
-      case "combo":
+      case "combo": {
+        console.log("ComboChart data:", data, "chartKey:", chartKey);
         return (
           <LineChart data={data}>
             <CartesianGrid
@@ -892,6 +892,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
             />
           </LineChart>
         );
+      }
       default:
         return null;
     }
@@ -925,9 +926,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                     leadsOverTime: e.target.value,
                   }))
                 }
-                className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                  theme === "dark" ? "border-slate-600" : "border-gray-300"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
               >
                 {getChartTypeOptions("leadsOverTime").map((option) => (
                   <option key={option.value} value={option.value}>
@@ -973,9 +972,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                     interactionsOverTime: e.target.value,
                   }))
                 }
-                className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                  theme === "dark" ? "border-slate-600" : "border-gray-300"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
               >
                 {getChartTypeOptions("interactionsOverTime").map((option) => (
                   <option key={option.value} value={option.value}>
@@ -1034,9 +1031,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                       leadQuality: e.target.value,
                     }))
                   }
-                  className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                    theme === "dark" ? "border-slate-600" : "border-gray-300"
-                  }`}
+                  className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
                 >
                   {getChartTypeOptions("leadQuality").map((option) => (
                     <option key={option.value} value={option.value}>
@@ -1083,9 +1078,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                     engagementFunnel: e.target.value,
                   }))
                 }
-                className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                  theme === "dark" ? "border-slate-600" : "border-gray-300"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
               >
                 {getChartTypeOptions("engagementFunnel").map((option) => (
                   <option key={option.value} value={option.value}>
@@ -1132,9 +1125,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                       interactionsToConvert: e.target.value,
                     }))
                   }
-                  className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                    theme === "dark" ? "border-slate-600" : "border-gray-300"
-                  }`}
+                  className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
                 >
                   {getChartTypeOptions("interactionsToConvert").map(
                     (option) => (
@@ -1183,9 +1174,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                     timeToConvert: e.target.value,
                   }))
                 }
-                className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                  theme === "dark" ? "border-slate-600" : "border-gray-300"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
               >
                 {getChartTypeOptions("timeToConvert").map((option) => (
                   <option key={option.value} value={option.value}>
@@ -1208,13 +1197,13 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
         {/* Source Breakdown */}
         <div className={cardClass}>
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="font-bold">{chartInfo[6].title}</span>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Info
                     size={16}
-                    className="text-muted-foreground cursor-help"
+                    className="text-muted-foreground cursor-help flex-shrink-0"
                   />
                 </TooltipTrigger>
                 <TooltipContent side="right" className="max-w-xs">
@@ -1231,9 +1220,7 @@ export default function OverviewCharts({ filters, onSegmentClick }) {
                     sourceBreakdown: e.target.value,
                   }))
                 }
-                className={`appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm ${
-                  theme === "dark" ? "border-slate-600" : "border-gray-300"
-                }`}
+                className="appearance-none bg-background border rounded px-3 py-1 pr-8 text-sm border-slate-600"
               >
                 {getChartTypeOptions("sourceBreakdown").map((option) => (
                   <option key={option.value} value={option.value}>
